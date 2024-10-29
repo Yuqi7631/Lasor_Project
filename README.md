@@ -1,2 +1,2 @@
-# Laser_Project
-The laser project of the Software Carpentry course.
+# Lasor_Project
+The lasor project of the Software Carpentry course.
