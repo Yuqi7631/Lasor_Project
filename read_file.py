@@ -37,10 +37,3 @@ def grid_info(file_name):
         else:
             print("No grid")
     return grid_content, A_value, B_value, C_value, L_value, P_value, column, row 
-
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        grid_content, A_value, B_value, C_value, L_value, P_value, column, row = grid_info(sys.argv[1])
-        print(grid_content, A_value, B_value, C_value, L_value, P_value, column, row)
-    else:
-        print("print file's name")
