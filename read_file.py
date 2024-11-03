@@ -37,3 +37,27 @@ def grid_info(file_name):
         else:
             print("No grid")
     return grid_content, A_value, B_value, C_value, L_value, P_value, column, row 
+
+class Grid:
+
+    def __init__(self, A, B, C, position=None):
+        self.A = A
+        self.B = B
+        self.C = C
+        self.position = position
+
+    def interact_with_laser(self, laser):
+        pass
+
+
+class Laser:
+
+    def __init__(self, x, y, vx, vy):
+        self.x = x
+        self.y = y
+        self.vx = vx
+        self.vy = vy
+
+    def move(self):
+        self.x += self.vx
+        self.y += self.vy
