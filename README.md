@@ -43,3 +43,6 @@ GRID STOP<br>
   - `P 0 3`
   - `P 6 1`
 ## Sample Image
+![alt test](solution_output.png)
+
+Good luck!
