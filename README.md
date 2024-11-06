@@ -1,5 +1,5 @@
 # Lasor_Project
-The lasor project of the Software Carpentry course.
+This is a Python program designed to automatically solve levels in the "Lazors" game by placing various types of blocks on a grid to direct laser paths through designated points. The project reads custom puzzle files (`. bff` format) and outputs solutions with block placements needed to solve each level.
 
-# Group Members: 
+# Authors: 
 Yuqi Feng, Selina(Yilin) Luo
