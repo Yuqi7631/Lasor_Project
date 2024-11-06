@@ -42,3 +42,4 @@ GRID STOP<br>
 - **Targets**:
   - `P 0 3`
   - `P 6 1`
+## Sample Image
