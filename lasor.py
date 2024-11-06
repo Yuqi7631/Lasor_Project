@@ -125,20 +125,17 @@ class Grid:
                     self.grid_blocks[2*y+1][2*x+1] = Block(cell, 2*x+1, 2*y+1)
                 elif cell == 'x':
                     self.grid_blocks[2*y+1][2*x+1] = 'x' 
-    
+
     def place_block(self, block_type, x, y):
         # Place a block at a specific position
         if self.grid_blocks[y][x] is None:
             self.grid_blocks[y][x] = Block(block_type, x, y)
-            return True
-        return False
 
 def on_grid_check(x, y, grid_blocks):
-    return 0 <= x <= len(grid_blocks[0]) and 0 <= y <= len(grid_blocks)
+    return 0 <= x < len(grid_blocks[0])-1 and 0 <= y < len(grid_blocks)-1
 
-def on_block_check(x, y, block:Block):
-    boundary = [(block.x-1, y), (block.x+1, y),(x, block.y+1),(x, block.y-1)]
-    return (x,y) in boundary
+def block_on_grid_check(laser, grid_blocks):
+    return 0 <= laser.x + laser.vx < len(grid_blocks[0])-1 and 0 < laser.y + laser.vy <=len(grid_blocks)-1
 
 # Simulate laser propagation and record the laser path
 def move_lasers(grid_blocks, lasers):
@@ -146,21 +143,31 @@ def move_lasers(grid_blocks, lasers):
     all_paths = []
     while active_lasers:
         new_lasers = []
+        new_laser = None
         for laser in active_lasers:
-            laser.move()
-            x, y = laser.x, laser.y
-            if not on_grid_check(x, y, grid_blocks):
-                laser.active = False
-                continue
-            block = grid_blocks[int(y)][int(x)]
-            if block and isinstance(block, Block):
-                new_laser = block.interact_with_laser(laser)
-                if new_laser:
-                    new_lasers.append(new_laser)
-            all_paths.append((laser.x, laser.y))
+            while laser.active:
+                x, y = laser.x, laser.y
+                if not on_grid_check(x, y, grid_blocks):
+                    laser.active = False
+                    all_paths.append((x, y))
+                    continue
+                if block_on_grid_check:
+                    if (y + laser.vy) % 2 != 0:
+                        block_1 = grid_blocks[int(y+laser.vy)][int(x)]
+                        if block_1 and isinstance(block_1, Block):
+                            new_laser = block_1.interact_with_laser(laser)
+                    elif (x + laser.vx) % 2 != 0:
+                        block_2 = grid_blocks[int(y)][int(x+laser.vx)]
+                        if block_2 and isinstance(block_2, Block):
+                            new_laser = block_2.interact_with_laser(laser)
+                    if new_laser:
+                        new_lasers.append(new_laser)
+                laser.move()
+                all_paths.append((laser.x, laser.y))
         # update laser list
-        active_lasers = [laser for laser in active_lasers if laser.active]
-        active_lasers.extend(new_lasers)
+        active_lasers = new_lasers
+        # active_lasers = [laser for laser in active_lasers if laser.active]
+        # active_lasers.extend(new_lasers)
     return all_paths
 
 # Check if the current block placement allows all target points to be hit
@@ -174,7 +181,6 @@ def check_solution(grid_blocks, lasers, targets):
 
 def solve_lazor_game(file_path):
     grid_content, A_value, B_value, C_value, L_value, P_value, column, row = grid_info(file_path)
-
     # Create game grid
     game_grid = Grid(grid_content, column, row)
     # Initialize laser list
@@ -183,19 +189,14 @@ def solve_lazor_game(file_path):
     targets = set((x, y) for (x, y) in P_value)
     # Aquire empty positions
     empty_positions = [(x, y) for y in range(row) for x in range(column) if game_grid.grid_blocks[2*y+1][2*x+1] is None]
-    print(empty_positions)
     # Generate all possible block placement combinations.
     total_blocks = A_value + B_value + C_value
-    print(total_blocks)
     if total_blocks > len(empty_positions):
         print("Error: Not enough empty positions for the blocks.")
         return None
     block_types = ['A'] * A_value + ['B'] * B_value + ['C'] * C_value
-    print(block_types)
     positions_combinations = itertools.combinations(empty_positions, total_blocks)
     block_types_permutations = set(itertools.permutations(block_types))
-    print(positions_combinations)
-    print(block_types_permutations)
     for positions in positions_combinations:
         for block_types_perm in block_types_permutations:
             # Place block on grid
@@ -212,45 +213,30 @@ def solve_lazor_game(file_path):
     return None
 
 # Create image to show solution
-def save_solution_image(grid_content, column, row, lasers, targets, image_filename="solution_output.png", cell_size=50):
-    grid = Grid(grid_content, column, row)
+def save_solution_image(game_grid, column, row, lasers, targets, image_filename="solution_output.png", cell_size=50):
+    grid = game_grid
     width = column * cell_size
     height = row * cell_size
     image = Image.new("RGB", (width, height), "white")
     draw = ImageDraw.Draw(image)
 
     # Draw the grid and blocks
-    for y in range(row):
-        for x in range(column):
+    for y in range(game_grid.row):
+        for x in range(game_grid.column):
             top_left = (x * cell_size, y * cell_size)
             bottom_right = ((x + 1) * cell_size, (y + 1) * cell_size)
-            cell = grid.grid_blocks[y][x]
+            cell = grid.grid_blocks[2*y+1][2*x+1]
             if cell == 'x':
                 draw.rectangle([top_left, bottom_right], fill="gray")
             elif cell is None:
                 draw.rectangle([top_left, bottom_right], outline="black")
             elif isinstance(cell, Block):
-                if cell.block_type == 'A':
-                    draw.rectangle([top_left, bottom_right], fill="blue")
-                elif cell.block_type == 'B':
-                    draw.rectangle([top_left, bottom_right], fill="red")
-                elif cell.block_type == 'C':
-                    draw.rectangle([top_left, bottom_right], fill="green")
-
-    # draw targets
-    for (tx, ty) in targets:
-        cx = tx * cell_size
-        cy = ty * cell_size
-        draw.ellipse([cx - 5, cy - 5, cx + 5, cy + 5], fill="orange")
-
-    # draw laser path
-    for laser in lasers:
-        path = laser.path
-        if path:
-            for i in range(len(path) - 1):
-                start = (path[i][0] * cell_size, path[i][1] * cell_size)
-                end = (path[i + 1][0] * cell_size, path[i + 1][1] * cell_size)
-                draw.line([start, end], fill="red", width=2)
+                if cell.type == 'A':
+                    draw.rectangle([top_left, bottom_right], fill="skyblue")
+                elif cell.type == 'B':
+                    draw.rectangle([top_left, bottom_right], fill="LightPink")
+                elif cell.type == 'C':
+                    draw.rectangle([top_left, bottom_right], fill="PaleGreen")
 
     image.save(image_filename)
     print(f"Solution image saved as {image_filename}")
@@ -266,7 +252,7 @@ if __name__ == '__main__':
         result = solve_lazor_game(file_path)
         if result is not None:
             game_grid, lasers, targets, column, row = result
-            save_solution_image(game_grid.grid_content, column, row, lasers, targets)
+            save_solution_image(game_grid, column, row, lasers, targets)
             end_time = time.time()
             solution_time = (end_time - start_time)/60
             print(f"Time taken to find the solution{solution_time:.4f} min")
