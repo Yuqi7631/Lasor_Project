@@ -17,9 +17,13 @@ Here, replace file_path with the path to your `. bff` file.
 The program will generate an image file named `file_name.png` that displays the solution and shows the time taken to solve it.
 
  Grey = no block allowed
+  
  White = blocks allowed
+  
  Skyblue= reflect block
+  
  Lightpink = fixed opaque block
+  
  Green= refract block
 
 
