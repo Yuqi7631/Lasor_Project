@@ -44,6 +44,9 @@ GRID STOP<br>
   - `P 6 1`
 ## Sample Image
 ![alt test](solution_output.png)
- mad_1solution:
+ 
+mad_1solution:
+ 
 ![mad_1](mad_1.png)
+ 
  Good luck!
