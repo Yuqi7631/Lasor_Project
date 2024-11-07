@@ -254,7 +254,7 @@ def save_solution_image(game_grid, column, row, image_filename, cell_size=50):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2 :
-        print("Usage: python3 lasor.py file_path")
+        print("Usage: python lasor.py file_path")
         sys.exit(1)
     else:
         file_path = sys.argv[1]
