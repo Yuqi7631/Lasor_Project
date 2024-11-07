@@ -9,12 +9,20 @@ Yuqi Feng, Selina(Yilin) Luo
 You can get the `. bff` file and run the program by passing the file path as an augment.
 In your terminal, navigate to the directory containing `lasor.py` and run:
 ```markdown
-python3 lasor.py file_path
+python lasor.py file_path
 ```
 Here, replace file_path with the path to your `. bff` file.
 
 ## Output
-The program will generate an image file named `solution_output.png` that displays the solution and shows the time taken to solve it.
+The program will generate an image file named `file_name.png` that displays the solution and shows the time taken to solve it.
+```markdown
+ Grey = no block allowed
+ White = blocks allowed
+ Skyblue= reflect block
+ Lightpink = fixed opaque block
+ Green= refract block
+```
+
 
 # Sample Solution
 ## Sample .bff file
